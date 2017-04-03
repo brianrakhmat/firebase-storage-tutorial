@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+      <title>Home</title>
+      <!--Import Google Icon Font-->
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <!--Import materialize.css-->
+      <link type="text/css" rel="stylesheet" href="assets/css/materialize.min.css"  media="screen,projection"/>
+
+      <!--Let browser know website is optimized for mobile-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <!--Import jQuery before materialize.js-->
+      <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+      <script type="text/javascript" src="assets/js/materialize.min.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/3.4.0/firebase.js"></script>
+      <script>
+        $(document).ready(function(){
+        $(".button-collapse").sideNav();
+        $('.materialboxed').materialbox();
+        });
+      </script>
+    </head>
+    
+    <body>
+        <!--Menu & Sidebar start-->
+        <nav>
+            <div class="container">
+                <div class="nav-wrapper">
+                    <a href="index.html" class="brand-logo">Home</a>
+                    <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+                        <ul class="right hide-on-med-and-down">
+                            <li class="active"><a href="index.html">Home</a></li>
+                        </ul>
+                        <ul class="side-nav" id="mobile-demo">
+                            <li class="active"><a href="index.html">Home</a></li>
+                        </ul>
+                </div>
+            </div>
+        </nav>
+      <!--Menu & Sidebar end-->
+
+        <div class="container">
+            <div class="row">
+                <!--Desc-->
+                <div class="col s12">
+                    <div class="card-panel teal">
+                        <span class="white-text"><center>Firebase Storage Upload</center>
+                        </span>
+                    </div>
+                </div>
+                <!--Desc-->
+
+                <div class="file-field input-field">
+                    <div class="btn">
+                        <span>File</span>
+                        <input type="file" onchange="previewFile()">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
+                </div>
+                <p id="url"><b>Firebase Storage URL: </b></p>
+                <div class="col s12">
+                    <img class="responsive-img" src="https://firebasestorage.googleapis.com/v0/b/img-storage-d41a0.appspot.com/o/images%2Ffirebase-storage.jpg?alt=media&token=394aeb7e-c10b-4b02-b7b2-144795ebf4a8" id="preview" alt="Preview Image">
+                </div>
+            </div>
+        </div>
+        <footer class="page-footer">   
+            <div class="footer-copyright">
+                <div class="container">
+                © 2017 Brianrakhmataji.com
+                </div>
+            </div>
+      </footer>
+    </body>
+    <script>
+        var config = {
+        apiKey: "AIzaSyD8saoX0XhzFv24NyqrmGYSJ-lvyEerku8", 
+        authDomain: "img-storage-d41a0.firebaseapp.com",
+        databaseURL: "https://img-storage-d41a0.firebaseio.com",
+        projectId: "img-storage-d41a0",
+        storageBucket: "img-storage-d41a0.appspot.com",
+        messagingSenderId: "337037106958"
+        };
+        firebase.initializeApp(config);
+
+        var storageRef = firebase.storage().ref();
+
+
+        var imagesRef = storageRef.child('images');
+        function previewFile(){
+
+        var file =document.querySelector('input[type=file]').files[0];
+
+        var metadata = {
+        contentType: 'image/jpeg'
+        };
+
+        var uploadTask = storageRef.child('images/' + file.name).put(file, metadata);
+
+        uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED,
+        function(snapshot) {
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Upload is ' + progress + '% done');
+            switch (snapshot.state) 
+            {
+                case firebase.storage.TaskState.PAUSED: 
+                    console.log('Upload is paused');
+                    break;
+                case firebase.storage.TaskState.RUNNING:
+                    console.log('Upload is running');
+                    break;
+            }
+        }, 
+        function(error) {
+            console.log('Upload Error')
+        }, 
+        function() {
+            var starsRef = storageRef.child('images/'+ file.name);
+            starsRef.getDownloadURL().then(function(url) {
+                document.querySelector('#preview').src=url;
+                var t=document.querySelector('p')
+                t.innerHTML ='<b>Firebase Storage URL: </b>'+url
+            }).catch(function(error) {
+                console.log('Error Download File');
+            });
+        });
+        }
+    </script>
+</html>
